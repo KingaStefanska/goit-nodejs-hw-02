@@ -32,7 +32,8 @@ router.post("/", validate.contactValid, async (req, res, next) => {
 });
 
 router.delete("/:contactId", async (req, res, next) => {
-  const contact = await getContactById(req.params.contactId);
+  const { contactId } = req.params;
+  const contact = await getContactById(contactId);
 
   if (!contact) {
     return res.status(404).json({ message: "Not found" });
@@ -51,7 +52,7 @@ router.put("/:contactId", validate.contactUpdate, async (req, res, next) => {
     return res.status(404).json({ message: "Not found" });
   }
 
-  res.status(200).send(contact);
+  res.status(200).json(contactToEdit).send();
 });
 
 module.exports = router;
