@@ -26,9 +26,8 @@ router.get("/:contactId", async (req, res, next) => {
 });
 
 router.post("/", validate.contactValid, async (req, res, next) => {
-  const { name, email, phone } = req.body;
   const newContact = await addContact(req.body);
-  res.json({ status: "success", code: 201, data: { newContact } });
+  res.status(201).json({ status: "success", data: { newContact } });
 });
 
 router.delete("/:contactId", async (req, res, next) => {

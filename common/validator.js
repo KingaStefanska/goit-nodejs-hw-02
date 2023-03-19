@@ -1,5 +1,7 @@
 const Joi = require("joi");
 
+const { validate } = require("../src/middleware/validate.js");
+
 const contactValidation = Joi.object({
   name: Joi.string().min(3).max(30).required(),
 
@@ -30,20 +32,6 @@ const updateContact = Joi.object({
     })
     .optional(),
 }).min(1);
-
-const validate = (schema, obj, next, res) => {
-  const { error } = schema.validate(obj);
-  if (error) {
-    const [{ message }] = error.details;
-    console.log(error);
-    return res.json({
-      status: "failure",
-      code: 400,
-      message: `${message.replace(/"/g, "")}`,
-    });
-  }
-  next();
-};
 
 module.exports.contactValid = (req, res, next) => {
   return validate(contactValidation, req.body, next, res);
