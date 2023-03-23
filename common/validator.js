@@ -15,6 +15,7 @@ const contactValidation = Joi.object({
       "string.pattern.base": `Phone number must be written as 123-456-789`,
     })
     .required(),
+  favorite: Joi.boolean().optional(),
 });
 
 const updateContact = Joi.object({
@@ -31,7 +32,12 @@ const updateContact = Joi.object({
       "string.pattern.base": `Phone number must be written as 123-456-789.`,
     })
     .optional(),
+  favorite: Joi.boolean().optional(),
 }).min(1);
+
+const updateContactStatus = Joi.object({
+  favorite: Joi.boolean().required(),
+});
 
 module.exports.contactValid = (req, res, next) => {
   return validate(contactValidation, req.body, next, res);
@@ -39,4 +45,8 @@ module.exports.contactValid = (req, res, next) => {
 
 module.exports.contactUpdate = (req, res, next) => {
   return validate(updateContact, req.body, next, res);
+};
+
+module.exports.contactStatusUpdate = (req, res, next) => {
+  return validate(updateContactStatus, req.body, next, res);
 };
