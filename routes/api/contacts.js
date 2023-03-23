@@ -70,7 +70,7 @@ router.patch(
       return res.status(404).json({ message: "Not found" });
     }
 
-    res.status(200).json(contactToEdit).send({ contacts: contactStatus });
+    res.status(200).json(contactStatus).send({ contacts: contactStatus });
   }
 );
 
