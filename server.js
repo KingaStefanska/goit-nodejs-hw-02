@@ -1,5 +1,17 @@
-const app = require('./app')
+const mongoose = require("mongoose");
+const app = require("./app");
 
-app.listen(3000, () => {
-  console.log("Server running. Use our API on port: 3000")
-})
+const dbpath = process.env.MONGO_SECRET;
+const port = process.env.PORT;
+
+if (!dbpath) {
+  console.error("No db secret...");
+}
+
+mongoose
+  .connect(dbpath)
+  .then(() => app.listen(port), console.log("Database connection successful"))
+  .catch(() => {
+    console.log("Connection error");
+    process.exit(1);
+  });
