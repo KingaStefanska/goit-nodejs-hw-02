@@ -1,4 +1,5 @@
 const { Schema, model } = require("mongoose");
+const mongoose = require("mongoose");
 
 const user = new Schema({
   password: {
@@ -20,7 +21,7 @@ const user = new Schema({
     default: null,
   },
   owner: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.SchemaTypes.ObjectId,
     ref: "user",
   },
 });

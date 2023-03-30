@@ -14,6 +14,7 @@ const {
 } = require("../../controllers/users");
 const { registerHandler } = require("../../auth/registerHandler");
 const { auth } = require("../../auth/auth");
+const { User } = require("../../models/user");
 const validate = require("../../common/validator");
 
 router.post("/signup", validate.userValid, async (req, res, next) => {
@@ -55,7 +56,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/logout", auth, async (req, res, next) => {
-  const { id } = req.body;
+  const { id } = req.user;
   await updateUserToken(id);
   return res.status(204).send();
 });

@@ -8,10 +8,6 @@ const getUserById = async (userId) => {
   return User.findOne({ _id: userId });
 };
 
-const getUser = async (body) => {
-  return User.findOne(body);
-};
-
 const getUserByEmail = async (email) => {
   return User.findOne({ email });
 };
