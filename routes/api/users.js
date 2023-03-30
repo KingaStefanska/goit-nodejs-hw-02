@@ -56,8 +56,8 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/logout", auth, async (req, res, next) => {
-  const { id } = req.user;
-  await updateUserToken(id);
+  const { _id } = req.user;
+  await updateUserToken(_id);
   return res.status(204).send();
 });
 
