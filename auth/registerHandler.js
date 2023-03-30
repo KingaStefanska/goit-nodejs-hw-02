@@ -9,7 +9,13 @@ const hashPassword = (password) => {
 
 const registerHandler = async (email, password, subscription) => {
   const hashedPassword = hashPassword(password);
-  return User.create({ email, password: hashedPassword, subscription });
+  const user = await User.create({
+    email,
+    password: hashedPassword,
+    subscription,
+  });
+  user.save();
+  return user;
 };
 
 module.exports = { registerHandler };

@@ -1,15 +1,22 @@
 const jwt = require("jsonwebtoken");
+const { getUserById } = require("../controllers/users");
 const jwtSecret = process.env.JWT_SECRET;
 
-const auth = (req, res, next, user) => {
+const auth = async (req, res, next) => {
   const token = req.headers.authorization;
   if (!token) {
     return res.status(401).send("Not authorized");
   }
   try {
-    jwt.verify(token, jwtSecret);
-    req.user = user;
-    next();
+    const { id } = jwt.verify(token, jwtSecret);
+
+    const user = await getUserById(id);
+
+    if (user) {
+      next();
+    } else {
+      return res.status(401).send("Not authorized");
+    }
   } catch (err) {
     return res.status(401).send("Not authorized");
   }
