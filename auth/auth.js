@@ -12,7 +12,8 @@ const auth = async (req, res, next) => {
 
     const user = await getUserById(id);
 
-    if (user) {
+    if (user && user.token === token) {
+      req.user = user;
       next();
     } else {
       return res.status(401).send("Not authorized");

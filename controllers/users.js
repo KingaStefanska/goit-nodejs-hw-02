@@ -21,7 +21,6 @@ const updateUserToken = async (id) => {
 };
 
 module.exports = {
-  getUser,
   getUserById,
   getUserByEmail,
   getAllUsers,

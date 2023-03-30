@@ -66,14 +66,6 @@ router.get("/", auth, async (req, res, next) => {
   return res.status(200).json(users);
 });
 
-router.get("/:userId", auth, async (req, res, next) => {
-  const user = await getUserById(req.params.userId);
-  if (!user) {
-    return res.status(404).json({ message: "Not found" });
-  }
-  return res.status(200).json(user).send();
-});
-
 router.get("/current", auth, async (req, res, next) => {
   const { id } = req.user;
   const user = await getUserById(id);
@@ -82,6 +74,14 @@ router.get("/current", auth, async (req, res, next) => {
   } else {
     res.status(200).json({ data: user });
   }
+});
+
+router.get("/:userId", auth, async (req, res, next) => {
+  const user = await getUserById(req.params.userId);
+  if (!user) {
+    return res.status(404).json({ message: "Not found" });
+  }
+  return res.status(200).json(user).send();
 });
 
 module.exports = router;
