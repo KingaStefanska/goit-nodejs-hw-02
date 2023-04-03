@@ -62,15 +62,14 @@ router.patch(
     if (!req.body.favorite) {
       return res.status(400).json({ message: "Missing field favorite" });
     }
-    const contactStatus = await updateStatusContact(
-      contactId,
-      req.body.favorite
-    );
+    const contactStatus = await updateStatusContact(contactId, req.body, {
+      new: true,
+    });
     if (!contactStatus) {
       return res.status(404).json({ message: "Not found" });
     }
 
-    res.status(200).json(contactStatus).send({ contacts: contactStatus });
+    res.status(200).json(contactStatus);
   }
 );
 
