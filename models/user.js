@@ -25,7 +25,9 @@ const user = new Schema({
     ref: "user",
   },
 
-  avatarURL: String,
+  avatarURL: {
+    type: String,
+  },
 });
 
 const User = model("user", user);
