@@ -20,10 +20,14 @@ const updateUserToken = async (id) => {
   return User.findOneAndUpdate(id, { token: null });
 };
 
+const updateAvatar = async (id, avatarURL) =>
+  User.findByIdAndUpdate(id, { avatarURL });
+
 module.exports = {
   getUserById,
   getUserByEmail,
   getAllUsers,
   addUserToken,
   updateUserToken,
+  updateAvatar,
 };
