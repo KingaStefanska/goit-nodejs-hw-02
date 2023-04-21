@@ -4,43 +4,38 @@ const fs = require("fs/promises");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const jwtSecret = process.env.JWT_SECRET;
-const gravatar = require("gravatar");
+const nodemailer = require("nodemailer");
 const Jimp = require("jimp");
+const jwtSecret = process.env.JWT_SECRET;
 
 const {
+  createUser,
   getUserById,
   getUserByEmail,
   getAllUsers,
   addUserToken,
   updateUserToken,
   updateAvatar,
+  verifyToken,
+  templateHtml,
 } = require("../../controllers/users");
-const { registerHandler } = require("../../auth/registerHandler");
 const { auth } = require("../../auth/auth");
 const { AVATAR_DIRECTORY, upload } = require("../../common/upload");
 const validate = require("../../common/validator");
 
 router.post("/signup", validate.userValid, async (req, res, next) => {
-  let { email, password, subscription } = req.body;
+  let { email, password } = req.body;
   const emailInUse = await getUserByEmail(email);
   if (emailInUse) {
     return res.status(409).send("Email is already in use");
   }
-  const avatarURL = gravatar.url(email, {
-    s: "200", //size
-    r: "pg", //rating
-    d: "mm", //default
-  });
-  const newUser = await registerHandler(email, password, subscription);
-  res.status(201).json({
-    message: "Registration successful",
-    user: {
-      email: newUser.email,
-      subscription: newUser.subscription,
-      avatarURL,
-    },
-  });
+
+  try {
+    const newUser = await createUser(email, password);
+    return res.status(200).json(newUser);
+  } catch (error) {
+    return res.status(500).send("Something went wrong");
+  }
 });
 
 router.post("/login", async (req, res) => {
@@ -120,6 +115,64 @@ router.patch("/avatars", upload.single("avatar"), async (req, res, next) => {
     next(e);
   }
   res.status(200).json({ avatarURL });
+});
+
+router.post("/verify", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).send("Missing required filed mail");
+  }
+  try {
+    const user = await getUserByEmail(email);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    if (user.verify) {
+      return res.status(400).send("Verification has already been passed");
+    }
+
+    const authVerify = await nodemailer.createTestAccount();
+
+    const transporter = nodemailer.createTransport({
+      host: "smtp.ethereal.email",
+      port: 587,
+      secure: false,
+      auth: authVerify,
+    });
+
+    const sendEmail = async () => {
+      const info = await transporter.sendMail({
+        from: { name: "Kinga", address: "foo@example.com" },
+        to: user.email,
+        subject: `Verification ${new Date().toISOString()}`,
+        text: "Hello",
+        html: templateHtml(),
+      });
+      const previewUrl = nodemailer.getTestMessageUrl(info);
+      console.log(previewUrl);
+    };
+
+    await transporter.sendMail(sendEmail);
+    res.status(200).send("Verification email sent");
+  } catch (err) {
+    return res.status(500).send("Server error");
+  }
+});
+
+router.get("/verify/:verificationToken", async (req, res) => {
+  try {
+    const { verificationToken } = req.params;
+    const user = await verifyToken(verificationToken);
+
+    if (user) {
+      return res.status(200).send("Verification succesfull");
+    } else {
+      return res.status(404).send("User not found");
+    }
+  } catch (err) {
+    return res.status(500).send("Server error");
+  }
 });
 
 module.exports = router;
